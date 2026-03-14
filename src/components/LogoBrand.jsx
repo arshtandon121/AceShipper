@@ -6,7 +6,9 @@ const LogoBrand = () => {
     const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
     const [hovered, setHovered] = useState(false);
     const [tvOn, setTvOn] = useState(false);
+    const [audioEnabled, setAudioEnabled] = useState(false);
     const cardRef = useRef(null);
+    const videoRef = useRef(null);
 
     // After 3 seconds, transition from B&W to color
     useEffect(() => {
@@ -33,6 +35,22 @@ const LogoBrand = () => {
     const handleMouseEnter = () => {
         setHovered(true);
         setTvOn(true);
+        if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.volume = 0.6;
+
+            // Try to play depending on state
+            videoRef.current.muted = !audioEnabled;
+
+            videoRef.current.play().catch((error) => {
+                console.warn("Autoplay blocked. Falling back to muted video.", error);
+                if (videoRef.current) {
+                    videoRef.current.muted = true;
+                    setAudioEnabled(false);
+                    videoRef.current.play().catch(e => console.error("Muted playback also failed", e));
+                }
+            });
+        }
     };
 
     const handleMouseLeave = () => {
@@ -40,6 +58,26 @@ const LogoBrand = () => {
         setTvOn(false);
         setTilt({ x: 0, y: 0 });
         setGlowPos({ x: 50, y: 50 });
+        // Reset audio state when leaving
+        setAudioEnabled(false);
+        if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.muted = true;
+        }
+    };
+
+    const toggleAudio = (e) => {
+        // Prevent default cursor/click behaviors that might disrupt the TV
+        e.preventDefault();
+        const newAudioState = !audioEnabled;
+        setAudioEnabled(newAudioState);
+
+        if (videoRef.current) {
+            videoRef.current.muted = !newAudioState;
+            videoRef.current.volume = 0.6;
+            // Ensure video plays when clicked/unmuted
+            videoRef.current.play().catch(e => console.error("Play on click failed", e));
+        }
     };
 
     return (
@@ -145,11 +183,12 @@ const LogoBrand = () => {
                     onMouseMove={handleMouseMove}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
+                    onClick={toggleAudio}
                     style={{
                         transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${hovered ? 1.06 : 1})`,
                         padding: '3rem',
                         boxShadow: hovered
-                            ? '0 30px 80px rgba(99,179,237,0.3), 0 0 0 1px rgba(99,179,237,0.15)'
+                            ? (audioEnabled ? '0 30px 80px rgba(99,179,237,0.6), 0 0 0 2px rgba(99,179,237,0.4)' : '0 30px 80px rgba(99,179,237,0.3), 0 0 0 1px rgba(99,179,237,0.15)')
                             : 'none',
                         width: '400px',
                         height: '260px',
@@ -162,8 +201,7 @@ const LogoBrand = () => {
                     <div className={`tv-screen ${tvOn ? 'on' : ''}`}>
                         <video
                             ref={videoRef}
-                            src="/images/Pick_and_Pack_Video_Creation.mp4"
-                            muted
+                            src="/images/ace_video.mp4"
                             loop
                             playsInline
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -181,6 +219,36 @@ const LogoBrand = () => {
                             background: tvOn ? `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, rgba(99,179,237,0.3) 0%, transparent 60%)` : 'transparent',
                             zIndex: 6, pointerEvents: 'none'
                         }}></div>
+
+                        {/* Audio Indicator */}
+                        {tvOn && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '15px',
+                                right: '15px',
+                                zIndex: 20,
+                                opacity: 0.8,
+                                background: 'rgba(0,0,0,0.5)',
+                                padding: '4px 8px',
+                                borderRadius: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                            }}>
+                                {audioEnabled ? (
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#63b3ed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                    </svg>
+                                ) : (
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                        <line x1="23" y1="9" x2="17" y2="15"></line>
+                                        <line x1="17" y1="9" x2="23" y2="15"></line>
+                                    </svg>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <img
@@ -216,7 +284,7 @@ const LogoBrand = () => {
                     textTransform: 'uppercase',
                     color: '#63b3ed',
                     fontWeight: 600,
-                }}>Hover to broadcast</p>
+                }}>{hovered ? (audioEnabled ? 'Click to Mute' : 'Click to Enable Audio') : 'Hover to broadcast'}</p>
             </div>
         </section>
     );
