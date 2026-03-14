@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import LogoBrand from './components/LogoBrand';
 import HowItWorks from './components/HowItWorks';
 import Features from './components/Features';
 import Form from './components/Form';
@@ -82,6 +83,7 @@ function App() {
       <Navbar />
       <main>
         <Hero />
+        <LogoBrand />
         <HowItWorks />
         <Features />
         <Form />
