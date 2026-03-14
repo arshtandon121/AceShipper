@@ -3,8 +3,12 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import LogoBrand from './components/LogoBrand';
 import HowItWorks from './components/HowItWorks';
+import PickAndPack from './components/PickAndPack';
+import TrustBadges from './components/TrustBadges';
 import Features from './components/Features';
+import EarlyBirdBanner from './components/EarlyBirdBanner';
 import Form from './components/Form';
+import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import './App.css';
 
@@ -85,8 +89,12 @@ function App() {
         <Hero />
         <LogoBrand />
         <HowItWorks />
+        <PickAndPack />
+        <TrustBadges />
         <Features />
+        <EarlyBirdBanner />
         <Form />
+        <FAQ />
       </main>
       <Footer />
     </>
