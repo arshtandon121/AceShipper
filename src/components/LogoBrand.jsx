@@ -7,7 +7,6 @@ const LogoBrand = () => {
     const [hovered, setHovered] = useState(false);
     const [tvOn, setTvOn] = useState(false);
     const cardRef = useRef(null);
-    const videoRef = useRef(null);
 
     // After 3 seconds, transition from B&W to color
     useEffect(() => {
@@ -34,10 +33,6 @@ const LogoBrand = () => {
     const handleMouseEnter = () => {
         setHovered(true);
         setTvOn(true);
-        if (videoRef.current) {
-            videoRef.current.currentTime = 0;
-            videoRef.current.play().catch(() => { });
-        }
     };
 
     const handleMouseLeave = () => {
@@ -45,9 +40,6 @@ const LogoBrand = () => {
         setTvOn(false);
         setTilt({ x: 0, y: 0 });
         setGlowPos({ x: 50, y: 50 });
-        if (videoRef.current) {
-            videoRef.current.pause();
-        }
     };
 
     return (
@@ -86,6 +78,20 @@ const LogoBrand = () => {
                     0% { background-position: 0 0; }
                     100% { background-position: 0 100%; }
                 }
+                @keyframes moveBox {
+                    0% { transform: translateX(-150px) translateY(0); }
+                    100% { transform: translateX(500px) translateY(0); }
+                }
+                @keyframes rollerSpin {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-24px); }
+                }
+                @keyframes laserScan {
+                    0%, 30% { opacity: 0; height: 0; }
+                    40% { opacity: 0.8; height: 100px; transform: translateY(-50px); }
+                    60% { opacity: 0.8; height: 100px; transform: translateY(50px); }
+                    70%, 100% { opacity: 0; height: 0; }
+                }
                 .logo-brand-card {
                     transition: transform 0.15s ease, box-shadow 0.3s ease;
                     cursor: pointer;
@@ -100,6 +106,7 @@ const LogoBrand = () => {
                     overflow: hidden;
                     opacity: 0;
                     transition: opacity 0.3s ease;
+                    background: #0a0f1e;
                 }
                 .tv-screen.on {
                     opacity: 1;
@@ -139,7 +146,7 @@ const LogoBrand = () => {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     style={{
-                        transform: \`perspective(800px) rotateX(\${tilt.x}deg) rotateY(\${tilt.y}deg) scale(\${hovered ? 1.06 : 1})\`,
+                        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${hovered ? 1.06 : 1})`,
                         padding: '3rem',
                         boxShadow: hovered
                             ? '0 30px 80px rgba(99,179,237,0.3), 0 0 0 1px rgba(99,179,237,0.15)'
@@ -152,32 +159,27 @@ const LogoBrand = () => {
                     }}
                 >
                     {/* TV Screen overlay containing the video */}
-                    <div className={\`tv-screen \${tvOn ? 'on' : ''}\`}>
-                        <video 
+                    <div className={`tv-screen ${tvOn ? 'on' : ''}`}>
+                        <video
                             ref={videoRef}
-                            src="/images/hero-bg.mp4" 
-                            muted 
-                            loop 
+                            src="/images/Pick_and_Pack_Video_Creation.mp4"
+                            muted
+                            loop
                             playsInline
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                         <div className="crteffect"></div>
                         <div style={{
-                            position: 'absolute',
-                            top: 0, left: 0, right: 0, bottom: 0,
+                            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
                             background: tvOn ? 'rgba(10, 20, 40, 0.4)' : 'transparent',
                             zIndex: 4
                         }}></div>
-                        
+
                         {/* Glow spot following mouse inside TV */}
                         <div style={{
-                            position: 'absolute',
-                            top: 0, left: 0, right: 0, bottom: 0,
-                            background: tvOn 
-                                ? \`radial-gradient(circle at \${glowPos.x}% \${glowPos.y}%, rgba(99,179,237,0.3) 0%, transparent 60%)\` 
-                                : 'transparent',
-                            zIndex: 6,
-                            pointerEvents: 'none'
+                            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                            background: tvOn ? `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, rgba(99,179,237,0.3) 0%, transparent 60%)` : 'transparent',
+                            zIndex: 6, pointerEvents: 'none'
                         }}></div>
                     </div>
 
@@ -192,31 +194,31 @@ const LogoBrand = () => {
                             zIndex: 10,
                             animation: 'floatLogo 4s ease-in-out infinite',
                             filter: tvOn
-                                ? 'drop-shadow(0 0 20px rgba(99,179,237,1)) brightness(1.5)'
+                                ? `drop-shadow(0 0 20px rgba(99,179,237,1)) brightness(1.5)`
                                 : (colored ? 'drop-shadow(0 0 20px rgba(99,179,237,0.4))' : 'grayscale(1) brightness(0.75)'),
                             transform: tvOn ? 'scale(0.9)' : 'scale(1)',
                             transition: 'all 0.4s ease',
                             pointerEvents: 'none'
                         }}
                     />
-                </div >
-            </div >
+                </div>
+            </div>
 
-    <div style={{
-        marginTop: '1.5rem',
-        textAlign: 'center',
-        opacity: colored ? 1 : 0.4,
-        transition: 'opacity 2s ease',
-    }}>
-        <p style={{
-            fontSize: '0.85rem',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: '#63b3ed',
-            fontWeight: 600,
-        }}>Hover to broadcast</p>
-    </div>
-        </section >
+            <div style={{
+                marginTop: '1.5rem',
+                textAlign: 'center',
+                opacity: colored ? 1 : 0.4,
+                transition: 'opacity 2s ease',
+            }}>
+                <p style={{
+                    fontSize: '0.85rem',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: '#63b3ed',
+                    fontWeight: 600,
+                }}>Hover to broadcast</p>
+            </div>
+        </section>
     );
 };
 
