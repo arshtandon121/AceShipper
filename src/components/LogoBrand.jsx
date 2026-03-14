@@ -5,7 +5,9 @@ const LogoBrand = () => {
     const [tilt, setTilt] = useState({ x: 0, y: 0 });
     const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
     const [hovered, setHovered] = useState(false);
+    const [tvOn, setTvOn] = useState(false);
     const cardRef = useRef(null);
+    const videoRef = useRef(null);
 
     // After 3 seconds, transition from B&W to color
     useEffect(() => {
@@ -29,11 +31,23 @@ const LogoBrand = () => {
         setGlowPos({ x: glowX, y: glowY });
     };
 
-    const handleMouseEnter = () => setHovered(true);
+    const handleMouseEnter = () => {
+        setHovered(true);
+        setTvOn(true);
+        if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.play().catch(() => { });
+        }
+    };
+
     const handleMouseLeave = () => {
         setHovered(false);
+        setTvOn(false);
         setTilt({ x: 0, y: 0 });
         setGlowPos({ x: 50, y: 50 });
+        if (videoRef.current) {
+            videoRef.current.pause();
+        }
     };
 
     return (
@@ -48,10 +62,6 @@ const LogoBrand = () => {
             position: 'relative',
         }}>
             <style>{`
-                @keyframes bwReveal {
-                    0% { filter: grayscale(1) brightness(0.8); }
-                    100% { filter: grayscale(0) brightness(1); }
-                }
                 @keyframes floatLogo {
                     0%, 100% { transform: translateY(0px); }
                     50% { transform: translateY(-12px); }
@@ -60,30 +70,61 @@ const LogoBrand = () => {
                     0% { transform: scale(1); opacity: 0.6; }
                     100% { transform: scale(1.6); opacity: 0; }
                 }
+                @keyframes tvTurnOn {
+                    0% { transform: scale(1, 0.005); filter: brightness(10); opacity: 1; }
+                    40% { transform: scale(1, 0.02); filter: brightness(5); opacity: 1; }
+                    100% { transform: scale(1, 1); filter: brightness(1); opacity: 1; }
+                }
+                @keyframes crtFlicker {
+                    0% { opacity: 0.95; }
+                    5% { opacity: 0.85; }
+                    10% { opacity: 0.95; }
+                    15% { opacity: 1; }
+                    100% { opacity: 1; }
+                }
+                @keyframes scanlines {
+                    0% { background-position: 0 0; }
+                    100% { background-position: 0 100%; }
+                }
                 .logo-brand-card {
                     transition: transform 0.15s ease, box-shadow 0.3s ease;
                     cursor: pointer;
                     position: relative;
+                    border-radius: 24px;
+                    background: transparent;
                 }
-                .logo-brand-img {
-                    transition: filter 3s ease;
-                    animation: floatLogo 4s ease-in-out infinite;
-                    pointer-events: none;
-                    user-select: none;
-                }
-                .logo-brand-ring {
+                .tv-screen {
                     position: absolute;
-                    border-radius: 50%;
-                    border: 2px solid rgba(99, 179, 237, 0.5);
-                    animation: ringPulse 2.5s ease-out infinite;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    border-radius: 24px;
+                    overflow: hidden;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+                .tv-screen.on {
+                    opacity: 1;
+                    animation: tvTurnOn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+                }
+                .crteffect {
+                    position: absolute;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+                    background-size: 100% 4px, 6px 100%;
+                    z-index: 5;
                     pointer-events: none;
+                    animation: scanlines 10s linear infinite, crtFlicker 0.15s infinite;
+                    box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
                 }
             `}</style>
 
-            {/* Subtle ambient glow rings */}
             <div style={{ position: 'relative', display: 'inline-block' }}>
                 {hovered && [1.2, 1.5, 1.8].map((scale, i) => (
-                    <div key={i} className="logo-brand-ring" style={{
+                    <div key={i} className="" style={{
+                        position: 'absolute',
+                        borderRadius: '50%',
+                        border: '2px solid rgba(99, 179, 237, 0.5)',
+                        animation: 'ringPulse 2.5s ease-out infinite',
+                        pointerEvents: 'none',
                         width: '220px', height: '220px',
                         top: '50%', left: '50%',
                         marginTop: '-110px', marginLeft: '-110px',
@@ -91,7 +132,6 @@ const LogoBrand = () => {
                     }} />
                 ))}
 
-                {/* 3D tilt card */}
                 <div
                     ref={cardRef}
                     className="logo-brand-card"
@@ -99,52 +139,84 @@ const LogoBrand = () => {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     style={{
-                        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${hovered ? 1.06 : 1})`,
-                        borderRadius: '24px',
-                        padding: '2rem',
-                        background: hovered
-                            ? `radial-gradient(circle at ${glowPos.x}% ${glowPos.y}%, rgba(99,179,237,0.12) 0%, transparent 70%)`
-                            : 'transparent',
+                        transform: \`perspective(800px) rotateX(\${tilt.x}deg) rotateY(\${tilt.y}deg) scale(\${hovered ? 1.06 : 1})\`,
+                        padding: '3rem',
                         boxShadow: hovered
-                            ? `0 30px 80px rgba(99,179,237,0.3), 0 0 0 1px rgba(99,179,237,0.15)`
+                            ? '0 30px 80px rgba(99,179,237,0.3), 0 0 0 1px rgba(99,179,237,0.15)'
                             : 'none',
+                        width: '400px',
+                        height: '260px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}
                 >
+                    {/* TV Screen overlay containing the video */}
+                    <div className={\`tv-screen \${tvOn ? 'on' : ''}\`}>
+                        <video 
+                            ref={videoRef}
+                            src="/images/hero-bg.mp4" 
+                            muted 
+                            loop 
+                            playsInline
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                        <div className="crteffect"></div>
+                        <div style={{
+                            position: 'absolute',
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            background: tvOn ? 'rgba(10, 20, 40, 0.4)' : 'transparent',
+                            zIndex: 4
+                        }}></div>
+                        
+                        {/* Glow spot following mouse inside TV */}
+                        <div style={{
+                            position: 'absolute',
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            background: tvOn 
+                                ? \`radial-gradient(circle at \${glowPos.x}% \${glowPos.y}%, rgba(99,179,237,0.3) 0%, transparent 60%)\` 
+                                : 'transparent',
+                            zIndex: 6,
+                            pointerEvents: 'none'
+                        }}></div>
+                    </div>
+
                     <img
                         src="/logo_ace_shipper.png"
                         alt="Ace Shipper Logo"
-                        className="logo-brand-img"
                         style={{
-                            height: '260px',
+                            height: '180px',
                             width: 'auto',
                             display: 'block',
-                            filter: colored
-                                ? `drop-shadow(0 0 ${hovered ? '40px' : '20px'} rgba(99,179,237,${hovered ? '0.8' : '0.4'}))`
-                                : 'grayscale(1) brightness(0.75)',
-                            transition: colored
-                                ? 'filter 0.4s ease'
-                                : 'filter 3s ease',
+                            position: 'relative',
+                            zIndex: 10,
+                            animation: 'floatLogo 4s ease-in-out infinite',
+                            filter: tvOn
+                                ? 'drop-shadow(0 0 20px rgba(99,179,237,1)) brightness(1.5)'
+                                : (colored ? 'drop-shadow(0 0 20px rgba(99,179,237,0.4))' : 'grayscale(1) brightness(0.75)'),
+                            transform: tvOn ? 'scale(0.9)' : 'scale(1)',
+                            transition: 'all 0.4s ease',
+                            pointerEvents: 'none'
                         }}
                     />
-                </div>
-            </div>
+                </div >
+            </div >
 
-            {/* Label below */}
-            <div style={{
-                marginTop: '2rem',
-                textAlign: 'center',
-                opacity: colored ? 1 : 0.4,
-                transition: 'opacity 2s ease',
-            }}>
-                <p style={{
-                    fontSize: '0.85rem',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                    color: '#63b3ed',
-                    fontWeight: 600,
-                }}>Hover to interact</p>
-            </div>
-        </section>
+    <div style={{
+        marginTop: '1.5rem',
+        textAlign: 'center',
+        opacity: colored ? 1 : 0.4,
+        transition: 'opacity 2s ease',
+    }}>
+        <p style={{
+            fontSize: '0.85rem',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: '#63b3ed',
+            fontWeight: 600,
+        }}>Hover to broadcast</p>
+    </div>
+        </section >
     );
 };
 
