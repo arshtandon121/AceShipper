@@ -19,6 +19,7 @@ const Form = () => {
             email: e.target.email.value,
             city: e.target.city.value,
             phone: e.target.phone.value,
+            comment: e.target.comment.value || '',
             ip: userIp,
             location: userLocation,
             date: new Date().toISOString()
@@ -32,7 +33,7 @@ const Form = () => {
         setStatus('submitting');
 
         // Google Apps Script Web App URL
-        const URL = 'https://script.google.com/macros/s/AKfycbzlbhHhUSShoiOUFFmzgWHb8YAOOQZc5MfmDYClgE5FTPKIj4zmCUVVBO84eXzl7IWD/exec';
+        const URL = 'https://script.google.com/macros/s/AKfycbxHSBbhTqugvSH18RMV7Oq2y7UWAsXtzJiRu1wQR7pcqvX-wuZv-sEGh5q4gGSgjjTA/exec';
 
         if (URL === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE') {
             // Simulate success if the user hasn't put their URL in yet to not break the frontend demo
@@ -114,6 +115,17 @@ const Form = () => {
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="phone">Phone Number</label>
                                     <input type="tel" id="phone" className="form-input" placeholder="(555) 123-4567" required />
+                                </div>
+
+                                <div className="form-group full-width">
+                                    <label className="form-label" htmlFor="comment">Suggestions / Comments <span style={{ opacity: 0.5, fontWeight: 400 }}>(optional)</span></label>
+                                    <textarea
+                                        id="comment"
+                                        className="form-input"
+                                        placeholder="Any special requirements or questions..."
+                                        rows="3"
+                                        style={{ resize: 'vertical', minHeight: '80px', lineHeight: '1.6' }}
+                                    />
                                 </div>
 
                                 <div className="form-group full-width">

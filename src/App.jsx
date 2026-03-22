@@ -40,9 +40,34 @@ function App() {
       }
 
       try {
-        // Fetch public IP and Location
-        const geoResponse = await fetch('https://ipapi.co/json/');
-        const geoData = await geoResponse.json();
+        // Try multiple IP/geo APIs with fallback
+        let ip = 'Unknown';
+        let location = 'Unknown';
+
+        try {
+          // Primary: ipinfo.io (50k free requests/month, no CORS issues)
+          const geoResponse = await fetch('https://ipinfo.io/json?token=', { signal: AbortSignal.timeout(5000) });
+          const geoData = await geoResponse.json();
+          ip = geoData.ip || 'Unknown';
+          location = `${geoData.city || 'Unknown City'}, ${geoData.region || ''}, ${geoData.country || 'Unknown Country'}`.replace(', ,', ',');
+        } catch {
+          try {
+            // Fallback: ipapi.co
+            const fallbackResponse = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) });
+            const fallbackData = await fallbackResponse.json();
+            ip = fallbackData.ip || 'Unknown';
+            location = `${fallbackData.city || 'Unknown City'}, ${fallbackData.country_name || 'Unknown Country'}`;
+          } catch {
+            // Last resort: just get IP
+            try {
+              const ipResponse = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(5000) });
+              const ipData = await ipResponse.json();
+              ip = ipData.ip || 'Unknown';
+            } catch {
+              console.warn('Could not fetch IP address');
+            }
+          }
+        }
 
         const trackingData = {
           event_type: "Site Visit",
@@ -50,8 +75,9 @@ function App() {
           email: "N/A",
           city: "N/A",
           phone: "N/A",
-          ip: geoData.ip || "Unknown",
-          location: `${geoData.city || "Unknown City"}, ${geoData.country_name || "Unknown Country"}`,
+          comment: "",
+          ip: ip,
+          location: location,
           date: new Date().toISOString()
         };
 
@@ -59,7 +85,7 @@ function App() {
         sessionStorage.setItem('aceshipper_user_ip', trackingData.ip);
         sessionStorage.setItem('aceshipper_user_location', trackingData.location);
 
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQ1pRcr6Avu7LLum8ffje3yfq48iw2AidkdB9-J8OV71CjpI0zsKNYmxHgBo4LzJON/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxHSBbhTqugvSH18RMV7Oq2y7UWAsXtzJiRu1wQR7pcqvX-wuZv-sEGh5q4gGSgjjTA/exec';
 
         // Send 'Site Visit' event to Google Sheets
         await fetch(WEB_APP_URL, {
