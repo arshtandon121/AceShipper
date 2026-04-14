@@ -1,90 +1,72 @@
 import { useState } from 'react';
 
-const faqData = [
-    {
-        question: "What cities do you serve?",
-        answer: "We are currently launching in major metro cities across India. Join our early access list and we'll notify you as soon as we go live in your city!"
-    },
-    {
-        question: "What's the maximum parcel weight allowed?",
-        answer: "We support parcels up to 30 kg per item. For heavier or bulk shipments, reach out to us through the enquiry form and we'll arrange a custom solution."
-    },
-    {
-        question: "How do I track my shipment?",
-        answer: "Once your parcel is picked up, you'll receive a unique tracking link via SMS and email. You can monitor real-time status directly from your Aceshipper dashboard."
-    },
-    {
-        question: "How much does it cost?",
-        answer: "Our rates start as low as ₹35 per shipment, depending on weight and destination. We negotiate bulk discounts with top carriers and pass the savings to you — no hidden fees, ever."
-    },
-    {
-        question: "Do I need to pack my items before pickup?",
-        answer: "No! That's what we do. Just hand over your products — our team picks them up, professionally packs them with secure materials, and ships them out. Truly hassle-free."
-    },
-    {
-        question: "How do I get started?",
-        answer: "Simply fill out the early access form on this page. We'll reach out to onboard you, set up your dashboard, and schedule your first pickup — all within 24 hours."
-    }
+const faqs = [
+  { q: 'How quickly can I get started?',                 a: 'You can onboard in under 24 hours. Connect your store via our Shopify or WooCommerce plugin, ship us your stock, and we handle fulfillment from Day 1.' },
+  { q: 'Do I need a minimum order volume?',              a: 'No minimums, ever. Start with 1 order or 10,000. We scale with you on a month-to-month basis with zero lock-in contracts.' },
+  { q: 'Which e-commerce platforms do you integrate with?', a: 'We integrate with Shopify, WooCommerce, Amazon, Etsy, BigCommerce, and more via our open API. Setup takes minutes.' },
+  { q: 'Where are your warehouses located?',             a: 'Our primary fulfillment centres are in Sydney and Melbourne, with coverage across all major Australian metro areas.' },
+  { q: 'Can I use my own branded packaging?',            a: 'Absolutely. Send us your custom boxes, tape, or inserts and we will use them for every order at no extra charge.' },
+  { q: 'Do you handle returns?',                         a: 'Yes. We offer full returns management — items are received, inspected, and restocked or disposed of per your instructions.' },
+  { q: 'What if an item is lost or damaged in transit?', a: 'All shipments include transit protection. We process claims quickly and work directly with carriers to resolve issues fast.' },
+  { q: 'How does pricing work?',                         a: 'Simple pay-per-use: you pay per pick, pack, and ship — nothing else. No setup fees, no monthly minimums, full transparency from Day 1.' },
 ];
 
-const FAQItem = ({ item, isOpen, onClick }) => {
-    return (
-        <div className={`faq-item glass ${isOpen ? 'faq-open' : ''}`} onClick={onClick}>
-            <button className="faq-question" aria-expanded={isOpen}>
-                <span>{item.question}</span>
-                <svg
-                    className={`faq-chevron ${isOpen ? 'rotated' : ''}`}
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
-                    <polyline points="6 9 12 15 18 9" />
-                </svg>
-            </button>
-            <div className={`faq-answer ${isOpen ? 'faq-answer-open' : ''}`}>
-                <p>{item.answer}</p>
-            </div>
+export default function FAQ() {
+  const [open, setOpen] = useState(null);
+
+  return (
+    <section id="faq" className="py-24 px-6 bg-surface-container-lowest">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-16 rv">
+          <span className="text-primary font-label text-[10px] tracking-[0.3em] uppercase font-black">Support</span>
+          <h2 className="font-headline text-4xl md:text-5xl font-black tracking-tighter uppercase mt-3">
+            Got Questions?<br/><span className="text-primary">We've Got Answers.</span>
+          </h2>
+          <p className="text-on-surface-variant mt-4 max-w-sm mx-auto text-sm leading-relaxed">
+            Everything you need to know before you start shipping with Ace Shipper.
+          </p>
         </div>
-    );
-};
 
-const FAQ = () => {
-    const [openIndex, setOpenIndex] = useState(null);
-
-    const toggle = (index) => {
-        setOpenIndex(openIndex === index ? null : index);
-    };
-
-    return (
-        <section className="faq-section" id="faq">
-            <div className="container">
-                <div className="section-header animate-fade-in">
-                    <h2 className="section-title">
-                        Got <span className="text-gradient">Questions?</span>
-                    </h2>
-                    <p className="section-subtitle">
-                        Everything you need to know about Aceshipper, answered.
-                    </p>
+        {/* Accordion */}
+        <div className="divide-y divide-outline-variant/15">
+          {faqs.map((faq, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={i} className={`group transition-colors duration-200 rv ${isOpen ? 'bg-surface-container' : 'hover:bg-surface-container/50'}`}>
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  className="w-full px-6 py-5 flex items-start justify-between gap-6 text-left"
+                >
+                  <span className={`font-headline text-base font-bold uppercase tracking-tight transition-colors duration-200 flex-1 ${isOpen ? 'text-primary' : 'text-white group-hover:text-primary'}`}>
+                    {faq.q}
+                  </span>
+                  <span className={`material-symbols-outlined text-primary flex-shrink-0 transition-transform duration-300 mt-0.5 ${isOpen ? 'rotate-45' : ''}`}>
+                    add
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300"
+                  style={{ maxHeight: isOpen ? '200px' : '0px' }}
+                >
+                  <p className="px-6 pb-6 text-on-surface-variant text-sm leading-relaxed border-l-2 border-primary/40 ml-6">
+                    {faq.a}
+                  </p>
                 </div>
+              </div>
+            );
+          })}
+        </div>
 
-                <div className="faq-list animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                    {faqData.map((item, index) => (
-                        <FAQItem
-                            key={index}
-                            item={item}
-                            isOpen={openIndex === index}
-                            onClick={() => toggle(index)}
-                        />
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-};
-
-export default FAQ;
+        {/* Bottom CTA */}
+        <div className="mt-12 p-8 bg-surface-container border border-outline-variant/20 text-center rv">
+          <p className="text-on-surface-variant text-sm mb-4">Still have questions? We'd love to chat.</p>
+          <a href="mailto:hello@aceshipper.com.au" className="inline-flex items-center gap-2 text-primary font-black uppercase text-sm tracking-widest hover:underline transition-all">
+            <span className="material-symbols-outlined text-base">mail</span>
+            hello@aceshipper.com.au
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}

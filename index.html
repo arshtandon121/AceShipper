@@ -1,25 +1,184 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/logo_ace_shipper.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aceshipper</title>
+  <title>Ace Shipper | Precision Fulfillment — Australia</title>
+  <meta name="description" content="Australia's first tech-first fulfillment platform. Connect your store, send us your stock, and we handle everything from warehouse to doorstep — starting from Day 1." />
 
-  <!-- Google tag (gtag.js) -->
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind Config -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "outline-variant":            "#484849",
+            "on-primary":                 "#571a00",
+            "surface-container-high":     "#201f21",
+            "surface-container-highest":  "#262627",
+            "primary-container":          "#ff7941",
+            "surface-variant":            "#262627",
+            "on-surface":                 "#ffffff",
+            "primary-fixed-dim":          "#ff5e07",
+            "surface-container":          "#1a191b",
+            "on-background":              "#ffffff",
+            "on-primary-container":       "#431200",
+            "background":                 "#0e0e0f",
+            "outline":                    "#767576",
+            "surface-bright":             "#2c2c2d",
+            "error":                      "#ff716c",
+            "on-surface-variant":         "#adaaab",
+            "primary":                    "#ff9064",
+            "primary-fixed":              "#ff7941",
+            "surface":                    "#0e0e0f",
+            "secondary-container":        "#7c5800",
+            "secondary":                  "#feb700",
+            "tertiary":                   "#ffb951",
+            "surface-dim":                "#0e0e0f",
+            "surface-container-lowest":   "#000000",
+            "surface-container-low":      "#131314",
+          },
+          borderRadius: {
+            DEFAULT: "0px", lg: "0px", xl: "0px",
+            "2xl": "0px", "3xl": "0px", full: "9999px"
+          },
+          fontFamily: {
+            headline: ["Space Grotesk"],
+            body:     ["Inter"],
+            label:    ["Inter"]
+          },
+          keyframes: {
+            fadeUp:    { from: { opacity:0, transform:'translateY(28px)' }, to: { opacity:1, transform:'translateY(0)' } },
+            fadeLeft:  { from: { opacity:0, transform:'translateX(-28px)' }, to: { opacity:1, transform:'translateX(0)' } },
+            fadeRight: { from: { opacity:0, transform:'translateX(28px)' }, to: { opacity:1, transform:'translateX(0)' } },
+            shimmer:   { from: { left:'-75%' }, to: { left:'150%' } },
+            marquee:   { from: { transform:'translateX(0)' }, to: { transform:'translateX(-50%)' } },
+          },
+          animation: {
+            'fade-up':    'fadeUp .7s ease both',
+            'fade-left':  'fadeLeft .7s ease both',
+            'fade-right': 'fadeRight .7s ease both',
+            'shimmer':    'shimmer 3s infinite',
+            'marquee':    'marquee 26s linear infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+    body { font-family:'Inter',sans-serif; background:#0e0e0f; color:#fff; overflow-x:hidden; }
+    h1,h2,h3,.font-headline { font-family:'Space Grotesk',sans-serif; }
+
+    /* Perspective + tilt */
+    .perspective-1000 { perspective:1000px; }
+    .tilt-card { transform:rotateX(10deg) rotateY(-5deg); transition:transform .5s ease; }
+    .tilt-card:hover { transform:rotateX(0) rotateY(0); }
+
+    /* Glass */
+    .glass-pill { backdrop-filter:blur(16px); background:rgba(14,14,15,.75); }
+
+    /* Scroll progress */
+    #scroll-bar {
+      position:fixed; top:0; left:0; height:2px; z-index:9999;
+      background:linear-gradient(90deg,#ff9064,#ff5e07);
+      width:0; transition:width .1s linear;
+      box-shadow:0 0 10px rgba(255,144,100,.5);
+    }
+
+    /* Cursor glow — desktop only */
+    @media(pointer:fine){
+      #cursor-glow {
+        position:fixed; pointer-events:none; z-index:9990;
+        width:360px; height:360px; border-radius:50%;
+        background:radial-gradient(circle,rgba(255,144,100,.055) 0%,transparent 70%);
+        transform:translate(-50%,-50%);
+        transition:left .1s ease,top .1s ease;
+      }
+    }
+
+    /* Reveal */
+    .rv { opacity:0; transform:translateY(24px); transition:opacity .65s ease,transform .65s ease; }
+    .rv.in { opacity:1; transform:none; }
+    .rv-l { opacity:0; transform:translateX(-24px); transition:opacity .65s ease,transform .65s ease; }
+    .rv-l.in { opacity:1; transform:none; }
+    .rv-r { opacity:0; transform:translateX(24px); transition:opacity .65s ease,transform .65s ease; }
+    .rv-r.in { opacity:1; transform:none; }
+
+    /* Shimmer button */
+    .btn-sh { position:relative; overflow:hidden; }
+    .btn-sh::after {
+      content:''; position:absolute; top:-50%; left:-75%;
+      width:50%; height:200%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);
+      transform:skewX(-20deg);
+      animation:shimmer 3s ease infinite;
+    }
+    @keyframes shimmer { from{left:-75%} to{left:150%} }
+
+    /* Orange section divider */
+    .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(255,144,100,.25),transparent); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:#000}
+    ::-webkit-scrollbar-thumb{background:#ff906455;border-radius:2px}
+    ::-webkit-scrollbar-thumb:hover{background:#ff9064}
+  </style>
+
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-F70MX1KLJ4"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-F70MX1KLJ4');
+    window.dataLayer=window.dataLayer||[];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js',new Date()); gtag('config','G-F70MX1KLJ4');
   </script>
 </head>
 
-<body>
+<body class="bg-background text-on-background selection:bg-primary selection:text-on-primary">
+
+  <!-- Scroll progress -->
+  <div id="scroll-bar"></div>
+  <!-- Cursor glow -->
+  <div id="cursor-glow"></div>
+
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-</body>
 
+  <script>
+    /* Scroll progress */
+    const sb = document.getElementById('scroll-bar');
+    window.addEventListener('scroll', () => {
+      const tot = document.documentElement.scrollHeight - window.innerHeight;
+      sb.style.width = (window.scrollY / tot * 100) + '%';
+    }, {passive:true});
+
+    /* Cursor glow */
+    const cg = document.getElementById('cursor-glow');
+    if(cg) window.addEventListener('mousemove', e => {
+      cg.style.left = e.clientX + 'px';
+      cg.style.top  = e.clientY + 'px';
+    }, {passive:true});
+
+    /* Reveal on scroll */
+    const ro = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); ro.unobserve(e.target); } });
+    }, {threshold:.1});
+    const attachRv = () =>
+      document.querySelectorAll('.rv,.rv-l,.rv-r').forEach(el => ro.observe(el));
+    setTimeout(attachRv, 600);
+    setTimeout(attachRv, 1800);
+  </script>
+</body>
 </html>
